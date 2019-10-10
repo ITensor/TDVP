@@ -3,9 +3,9 @@
 
 # 2. Edit LIBRARY_DIR to point at the location of your ITensor Library
 #    source folder (this is the folder that has options.mk in it).
-#    Also, edit IDMRG_DIR to point at the location of the iDMRG source files.
+#    Also, edit TDVP_DIR to point at the location of the TDVP source files.
 LIBRARY_DIR=$(HOME)/software/itensor
-TDVP_DIR=$(HOME)/software/tdvp
+TDVP_DIR=$(HOME)/software/TDVP
 
 # 3. If your 'main' function is in a file called 'myappname.cc', then
 #    set APP to 'myappname'. Running 'make' will compile the app.
@@ -32,8 +32,8 @@ include $(LIBRARY_DIR)/options.mk
 
 TENSOR_HEADERS=$(LIBRARY_DIR)/itensor/core.h
 
-CCFLAGS+=-I$(IDMRG_DIR)
-CCGFLAGS+=-I$(IDMRG_DIR)
+CCFLAGS+=-I$(TDVP_DIR)
+CCGFLAGS+=-I$(TDVP_DIR)
 
 #Mappings --------------
 OBJECTS=$(patsubst %.cc,%.o, $(CCFILES))
