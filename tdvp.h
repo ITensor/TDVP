@@ -400,6 +400,7 @@ TDVPWorker(MPS & psi,
     
 	if(args.getBool("DoNormalize",true))
             {
+            if(numCenter==1) psi.position(1);
             psi.normalize();
             }
 
