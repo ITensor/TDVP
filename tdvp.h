@@ -14,7 +14,7 @@ template <class LocalOpT>
 Real
 TDVPWorker(MPS & psi,
            LocalOpT& PH,
-		   Cplx t,
+           Cplx t,
            const Sweeps& sweeps,
            const Args& args = Args::global());
 
@@ -22,7 +22,7 @@ template <class LocalOpT>
 Real
 TDVPWorker(MPS & psi,
            LocalOpT& PH,
-		   Cplx t,
+           Cplx t,
            const Sweeps& sweeps,
            DMRGObserver & obs,
            Args args = Args::global());
@@ -38,7 +38,7 @@ TDVPWorker(MPS & psi,
 Real inline
 tdvp(MPS & psi, 
      MPO const& H,
-	 Cplx t, 
+     Cplx t, 
      const Sweeps& sweeps,
      const Args& args = Args::global())
     {
@@ -53,7 +53,7 @@ tdvp(MPS & psi,
 Real inline
 tdvp(MPS & psi, 
      MPO const& H, 
-	 Cplx t,
+     Cplx t,
      const Sweeps& sweeps, 
      DMRGObserver & obs,
      const Args& args = Args::global())
@@ -71,9 +71,9 @@ tdvp(MPS & psi,
 Real inline
 tdvp(MPS & psi, 
      MPO const& H, 
-	 Cplx t,
+     Cplx t,
      ITensor const& LH, 
-	 ITensor const& RH,
+     ITensor const& RH,
      const Sweeps& sweeps,
      const Args& args = Args::global())
     {
@@ -89,9 +89,9 @@ tdvp(MPS & psi,
 Real inline
 tdvp(MPS & psi, 
      MPO const& H, 
-	 Cplx t,
+     Cplx t,
      ITensor const& LH, 
-	 ITensor const& RH,
+     ITensor const& RH,
      const Sweeps& sweeps, 
      DMRGObserver& obs,
      const Args& args = Args::global())
@@ -108,7 +108,7 @@ tdvp(MPS & psi,
 Real inline
 tdvp(MPS& psi, 
      std::vector<MPO> const& Hset,
-	 Cplx t, 
+     Cplx t, 
      const Sweeps& sweeps,
      const Args& args = Args::global())
     {
@@ -124,7 +124,7 @@ tdvp(MPS& psi,
 Real inline
 tdvp(MPS & psi, 
      std::vector<MPO> const& Hset, 
-	 Cplx t,
+     Cplx t,
      const Sweeps& sweeps, 
      DMRGObserver& obs,
      const Args& args = Args::global())
@@ -143,7 +143,7 @@ template <class LocalOpT>
 Real
 TDVPWorker(MPS & psi,
            LocalOpT& PH,
-		   Cplx t,
+	   Cplx t,
            Sweeps const& sweeps,
            Args const& args)
     {
@@ -156,28 +156,28 @@ template <class LocalOpT>
 Real
 TDVPWorker(MPS & psi,
            LocalOpT& PH,
-		   Cplx t,
+	   Cplx t,
            Sweeps const& sweeps,
            DMRGObserver& obs,
            Args args)
     {
     if( args.defined("WriteM") )
-		{
- 		if( args.defined("WriteDim") )
-			{
-			Global::warnDeprecated("Args WirteM and WriteDim are both defined. WriteM is deprecated in favor of WriteDim, WriteDim will be used.");
- 			}
- 		else
- 			{
- 			Global::warnDeprecated("Arg WriteM is deprecated in favor of WriteDim.");
- 			args.add("WriteDim",args.getInt("WriteM"));
- 			}
- 		}
+        {
+        if( args.defined("WriteDim") )
+            {
+            Global::warnDeprecated("Args WirteM and WriteDim are both defined. WriteM is deprecated in favor of WriteDim, WriteDim will be used.");
+            }
+        else
+            {
+            Global::warnDeprecated("Arg WriteM is deprecated in favor of WriteDim.");
+            args.add("WriteDim",args.getInt("WriteM"));
+            }
+        }
     
-	// Truncate blocks of degenerate singular values (or not)
+    // Truncate blocks of degenerate singular values (or not)
     args.add("RespectDegenerate",args.getBool("RespectDegenerate",true));
     
-	const bool silent = args.getBool("Silent",false);
+    const bool silent = args.getBool("Silent",false);
     if(silent)
         {
         args.add("Quiet",true);
@@ -198,7 +198,7 @@ TDVPWorker(MPS & psi,
     args.add("DoNormalize",true);
 
     if(numCenter == 2)
-		{	
+        {	
         for(int sw = 1; sw <= sweeps.nsweep(); ++sw)
             {
             cpu_time sw_time;
@@ -235,26 +235,26 @@ TDVPWorker(MPS & psi,
 
                 auto phi = psi.A(b)*psi.A(b+1);
 
-				energy = applyExp(PH,phi,t/2,args);
+                energy = applyExp(PH,phi,t/2,args);
 
-				if(args.getBool("DoNormalize",true))
-					{
-					phi/=norm(phi);
-					}
-				
-				auto spec = psi.svdBond(b,phi,(ha==1?Fromleft:Fromright),PH,args);
+                if(args.getBool("DoNormalize",true))
+                    {
+                    phi/=norm(phi);
+                    }
 
-				if((ha == 1 && b+1 != N) || (ha == 2 && b != 1))
-					{	
-					PH.numCenter(1);
-					PH.position((ha == 1? b+1: b),psi);//position1: fromleft: b+1,fromright: b
-					auto& M = (ha == 1? psi.Aref(b+1):psi.Aref(b));
-					energy = applyExp(PH,M,-t/2,args);
-					if(args.getBool("DoNormalize",true))
-						{
-						M/=norm(M);
-						}
-					}
+                auto spec = psi.svdBond(b,phi,(ha==1?Fromleft:Fromright),PH,args);
+
+                if((ha == 1 && b+1 != N) || (ha == 2 && b != 1))
+                    {	
+                    PH.numCenter(1);
+                    PH.position((ha == 1? b+1: b),psi);//position1: fromleft: b+1,fromright: b
+                    auto& M = (ha == 1? psi.Aref(b+1):psi.Aref(b));
+                    energy = applyExp(PH,M,-t/2,args);
+                    if(args.getBool("DoNormalize",true))
+                        {
+                        M/=norm(M);
+                        }
+                    }
 
                 if(!quiet)
                     { 
@@ -278,14 +278,14 @@ TDVPWorker(MPS & psi,
 
                 } //for loop over b
     		
-			if(!silent)
-				{	
-            	auto sm = sw_time.sincemark();
-            	printfln("    Sweep %d/%d CPU time = %s (Wall time = %s)",
+                if(!silent)
+                    {	
+                    auto sm = sw_time.sincemark();
+                    printfln("    Sweep %d/%d CPU time = %s (Wall time = %s)"
                       		sw,sweeps.nsweep(),showtime(sm.time),showtime(sm.wall));
-    			}
+                    }
             
-			if(obs.checkDone(args)) break;
+                if(obs.checkDone(args)) break;
         
             } //for loop over sw
         }
@@ -293,7 +293,7 @@ TDVPWorker(MPS & psi,
         {	
         if(numCenter == 1)
             {
-			for(int sw = 1; sw <= sweeps.nsweep(); ++sw)
+            for(int sw = 1; sw <= sweeps.nsweep(); ++sw)
             	{
             	cpu_time sw_time;
             	args.add("Sweep",sw);
@@ -318,7 +318,7 @@ TDVPWorker(MPS & psi,
             	    }
 	
             	ITensor M;
-				for(int b = 1, ha = 1; ha <= 2; sweepnext1(b,ha,N))
+                for(int b = 1, ha = 1; ha <= 2; sweepnext1(b,ha,N))
             	    {
             	    if(!quiet)
             	        {
@@ -326,41 +326,41 @@ TDVPWorker(MPS & psi,
             	        }
 
             	    PH.numCenter(1);
-					PH.position(b,psi);//position1
+                    PH.position(b,psi);//position1
 
             	    ITensor phi;
-				  	if((ha == 1 && b != 1) || (ha == 2 && b != 	N))	phi = M*psi.A(b);//const reference
-					else	   phi = psi.A(b);
+                    if((ha == 1 && b != 1) || (ha == 2 && b != N))	phi = M*psi.A(b);//const reference
+                    else	   phi = psi.A(b);
 
-					energy = applyExp(PH,phi,t/2,args);
-					if(args.getBool("DoNormalize",true))
-						{
-						phi/=norm(phi);
-						}
+                    energy = applyExp(PH,phi,t/2,args);
+                    if(args.getBool("DoNormalize",true))
+                        {
+                        phi/=norm(phi);
+                        }
   	    
-					Spectrum spec;
-					if((ha == 1 && b != N) || (ha == 2 && b != 1))
-						{
-						ITensor U,V,S;
-						if(ha == 1)	V = ITensor(commonIndex(psi.A(b),psi.A(b+1),"Link"));
-						else		V = ITensor(commonIndex(psi.A(b-1),psi.A(b),"Link"));
-            	    	spec = svd(phi,U,S,V,args);// QR, oc tensor to be returned
-						psi.Aref(b) = U;
-						M = S*V;
+                    Spectrum spec;
+                    if((ha == 1 && b != N) || (ha == 2 && b != 1))
+                        {
+                        ITensor U,V,S;
+                        if(ha == 1)	V = ITensor(commonIndex(psi.A(b),psi.A(b+1),"Link"));
+                        else		V = ITensor(commonIndex(psi.A(b-1),psi.A(b),"Link"));
+                        spec = svd(phi,U,S,V,args);// QR, oc tensor to be returned
+                        psi.Aref(b) = U;
+                        M = S*V;
 
-						PH.numCenter(0);
-						PH.position((ha == 1? b+1: b),psi);//position0
+                        PH.numCenter(0);
+                        PH.position((ha == 1? b+1: b),psi);//position0
 
-						energy = applyExp(PH,M,-t/2,args);
-						if(args.getBool("DoNormalize",true))
-							{
-							M/=norm(M);
-							}
-						}
-					else
-						{
-						psi.Aref(b) = phi;
-						}
+                        energy = applyExp(PH,M,-t/2,args);
+                        if(args.getBool("DoNormalize",true))
+                            {
+                            M/=norm(M);
+                            }
+                        }
+                    else
+                        {
+                        psi.Aref(b) = phi;
+                        }
 
             	    if(!quiet)
             	        { 
@@ -384,29 +384,28 @@ TDVPWorker(MPS & psi,
     
             	    } //for loop over b
     
-				if(!silent)
-					{
+                    if(!silent)
+                        {
             		auto sm = sw_time.sincemark();
             		printfln("    Sweep %d/%d CPU time = %s (Wall time = %s)",
             	          		sw,sweeps.nsweep(),showtime(sm.time),showtime(sm.wall));
-    				}
+                        }
             	
-				if(obs.checkDone(args)) break;
-				} //for loop over sw
-			}
+                    if(obs.checkDone(args)) break;
+                } //for loop over sw
+            }
         else
             Error("Only support 1 and 2 sites algorithm presently.");
         }
     
 	if(args.getBool("DoNormalize",true))
-		{
-		psi.normalize();
-		}
+            {
+            psi.normalize();
+            }
 
     return energy;
     }
 
 } //namespace itensor
-
 
 #endif
