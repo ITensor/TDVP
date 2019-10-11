@@ -281,7 +281,7 @@ TDVPWorker(MPS & psi,
                 if(!silent)
                     {	
                     auto sm = sw_time.sincemark();
-                    printfln("    Sweep %d/%d CPU time = %s (Wall time = %s)"
+                    printfln("    Sweep %d/%d CPU time = %s (Wall time = %s)",
                       		sw,sweeps.nsweep(),showtime(sm.time),showtime(sm.wall));
                     }
             
