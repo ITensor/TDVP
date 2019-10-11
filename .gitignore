@@ -1,4 +1,5 @@
 *.o
+*.swp
 sample/Makefile
 sample/run
 
