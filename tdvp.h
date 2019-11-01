@@ -222,12 +222,16 @@ TDVPWorker(MPS & psi,
 
                 auto phi = psi.A(b)*psi.A(b+1);
 
-                energy = applyExp(PH,phi,t/2,args);
+                applyExp(PH,phi,t/2,args);
 
                 if(args.getBool("DoNormalize",true))
                     {
                     phi/=norm(phi);
                     }
+		    
+                ITensor Aw;
+                PH.product(phi,Aw);
+                energy = real(eltC(dag(phi)*Aw));
 
                 auto spec = psi.svdBond(b,phi,(ha==1?Fromleft:Fromright),PH,args);
 
@@ -236,11 +240,13 @@ TDVPWorker(MPS & psi,
                     PH.numCenter(1);
                     PH.position((ha == 1? b+1: b),psi);//position1: fromleft: b+1,fromright: b
                     auto& M = (ha == 1? psi.Aref(b+1):psi.Aref(b));
-                    energy = applyExp(PH,M,-t/2,args);
+                    applyExp(PH,M,-t/2,args);
                     if(args.getBool("DoNormalize",true))
                         {
                         M/=norm(M);
                         }
+		    PH.product(M,Aw);
+                    energy = real(eltC(dag(M)*Aw));
                     }
 
                 if(!quiet)
@@ -282,11 +288,15 @@ TDVPWorker(MPS & psi,
                 if((ha == 1 && b != 1) || (ha == 2 && b != N)) phi = M*psi.A(b);//const reference
                 else phi = psi.A(b);
 
-                energy = applyExp(PH,phi,t/2,args);
+                applyExp(PH,phi,t/2,args);
                 if(args.getBool("DoNormalize",true))
                     {
                     phi/=norm(phi);
                     }
+		
+		ITensor Aw;
+                PH.product(phi,Aw);
+                energy = real(eltC(dag(phi)*Aw));
 
                 Spectrum spec;
                 if((ha == 1 && b != N) || (ha == 2 && b != 1))
@@ -301,11 +311,13 @@ TDVPWorker(MPS & psi,
                     PH.numCenter(0);
                     PH.position((ha == 1? b+1: b),psi);//position0
 
-                    energy = applyExp(PH,M,-t/2,args);
+                    applyExp(PH,M,-t/2,args);
                     if(args.getBool("DoNormalize",true))
                         {
                         M/=norm(M);
                         }
+                    PH.product(M,Aw);
+                    energy = real(eltC(dag(M)*Aw));
                     }
                 else
                     {
