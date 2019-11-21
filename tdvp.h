@@ -143,7 +143,7 @@ template <class LocalOpT>
 Real
 TDVPWorker(MPS & psi,
            LocalOpT& PH,
-	   Cplx t,
+           Cplx t,
            Sweeps const& sweeps,
            Args const& args)
     {
@@ -155,7 +155,7 @@ TDVPWorker(MPS & psi,
 template <class LocalOpT>
 Real
 TDVPWorker(MPS & psi,
-           LocalOpT& PH,
+           LocalOpT& H,
            Cplx t,
            Sweeps const& sweeps,
            DMRGObserver& obs,
@@ -170,10 +170,10 @@ TDVPWorker(MPS & psi,
         args.add("Quiet",true);
         args.add("PrintEigs",false);
         args.add("NoMeasure",true);
-        args.add("DebugLevel",0);
+        args.add("DebugLevel",-1);
         }
     const bool quiet = args.getBool("Quiet",false);
-    const int debug_level = args.getInt("DebugLevel",(quiet ? 0 : 1));
+    const int debug_level = args.getInt("DebugLevel",(quiet ? -1 : 0));
     const int numCenter = args.getInt("NumCenter",2);
 
     const int N = length(psi);
@@ -194,7 +194,7 @@ TDVPWorker(MPS & psi,
         args.add("MaxDim",sweeps.maxdim(sw));
         args.add("MaxIter",sweeps.niter(sw));
  
-        if(!PH.doWrite()
+        if(!H.doWrite()
            && args.defined("WriteDim")
            && sweeps.maxdim(sw) >= args.getInt("WriteDim"))
             {
@@ -205,162 +205,114 @@ TDVPWorker(MPS & psi,
                 }
   
             //psi.doWrite(true);
-            PH.doWrite(true,args);
+            H.doWrite(true,args);
             }
 
-        if(numCenter==2)
+        // 0, 1 and 2-site wavefunctions
+        ITensor phi0,phi1;
+        Spectrum spec;
+        for(int b = 1, ha = 1; ha <= 2; sweepnext(b,ha,N,{"NumCenter=",numCenter}))
             {
-            for(int b = 1, ha = 1; ha <= 2; sweepnext(b,ha,N))
-                {
-                if(!quiet)
-                    {
-                    printfln("Sweep=%d, HS=%d, Bond=%d/%d",sw,ha,b,(N-1));
-                    }
+            if(!quiet)
+                printfln("Sweep=%d, HS=%d, Bond=%d/%d",sw,ha,b,(N-1));
   
-                PH.numCenter(2);
-                PH.position(b,psi);//position2
+            H.numCenter(numCenter);
+            H.position(b,psi);
 
-                auto phi = psi.A(b)*psi.A(b+1);
+            if(numCenter == 2)
+                phi1 = psi(b)*psi(b+1);
+            else if(numCenter == 1)
+                phi1 = psi(b);
 
-                applyExp(PH,phi,t/2,args);
+                applyExp(H,phi1,t/2,args);
 
                 if(args.getBool("DoNormalize",true))
+                    phi1 /= norm(phi1);
+   
+            if(numCenter == 2)
+                spec = psi.svdBond(b,phi1,(ha==1 ? Fromleft : Fromright),H,args);
+            else if(numCenter == 1)
+                psi.ref(b) = phi1;
+
+                // Calculate energy
+                ITensor H_phi1;
+                H.product(phi1,H_phi1);
+                energy = real(eltC(dag(phi1)*H_phi1));
+
+                if((ha == 1 && b+numCenter-1 != N) || (ha == 2 && b != 1))
                     {
-                    phi/=norm(phi);
-                    }
-		    
-                ITensor Aw;
-                PH.product(phi,Aw);
-                energy = real(eltC(dag(phi)*Aw));
+                    auto b1 = (ha == 1 ? b+1 : b);
 
-                auto spec = psi.svdBond(b,phi,(ha==1?Fromleft:Fromright),PH,args);
-
-                if((ha == 1 && b+1 != N) || (ha == 2 && b != 1))
-                    {	
-                    PH.numCenter(1);
-                    PH.position((ha == 1? b+1: b),psi);//position1: fromleft: b+1,fromright: b
-                    auto& M = (ha == 1? psi.Aref(b+1):psi.Aref(b));
-                    applyExp(PH,M,-t/2,args);
-                    if(args.getBool("DoNormalize",true))
+                    if(numCenter == 2)
                         {
-                        M/=norm(M);
+                        phi0 = psi(b1);
                         }
-		    PH.product(M,Aw);
-                    energy = real(eltC(dag(M)*Aw));
-                    }
-
-                if(!quiet)
-                    { 
-                    printfln("    Truncated to Cutoff=%.1E, Min_dim=%d, Max_dim=%d",
-                               sweeps.cutoff(sw),
-                               sweeps.mindim(sw), 
-                               sweeps.maxdim(sw) );
-                    printfln("    Trunc. err=%.1E, States kept: %s",
-                               spec.truncerr(),
-                               showDim(linkIndex(psi,b)) );
-                    }
-
-                obs.lastSpectrum(spec);
-
-                args.add("AtBond",b);
-                args.add("HalfSweep",ha);
-                args.add("Energy",energy); 
-                args.add("Truncerr",spec.truncerr()); 
-
-                obs.measure(args);
-
-                } //for loop over b
-            }
-        else if(numCenter==1)
-            {
-            ITensor M;
-            for(int b = 1, ha = 1; ha <= 2; sweepnext1(b,ha,N))
-                {
-                if(!quiet)
-                    {
-                    printfln("Sweep=%d, HS=%d, Bond=%d/%d",sw,ha,b,(N-1));
-                    }
-
-                PH.numCenter(1);
-                PH.position(b,psi);//position1
-
-                ITensor phi;
-                if((ha == 1 && b != 1) || (ha == 2 && b != N)) phi = M*psi.A(b);//const reference
-                else phi = psi.A(b);
-
-                applyExp(PH,phi,t/2,args);
-                if(args.getBool("DoNormalize",true))
-                    {
-                    phi/=norm(phi);
-                    }
-		
-		ITensor Aw;
-                PH.product(phi,Aw);
-                energy = real(eltC(dag(phi)*Aw));
-
-                Spectrum spec;
-                if((ha == 1 && b != N) || (ha == 2 && b != 1))
-                    {
-                    ITensor U,V,S;
-                    if(ha == 1) V = ITensor(commonIndex(psi.A(b),psi.A(b+1),"Link"));
-                    else V = ITensor(commonIndex(psi.A(b-1),psi.A(b),"Link"));
-                    spec = svd(phi,U,S,V,args);// QR, oc tensor to be returned
-                    psi.Aref(b) = U;
-                    M = S*V;
-
-                    PH.numCenter(0);
-                    PH.position((ha == 1? b+1: b),psi);//position0
-
-                    applyExp(PH,M,-t/2,args);
-                    if(args.getBool("DoNormalize",true))
+                    else if(numCenter == 1)
                         {
-                        M/=norm(M);
+                        ITensor U,S,V;
+                        if(ha == 1) V = ITensor(commonIndex(psi(b),psi(b+1)));
+                        else V = ITensor(commonIndex(psi(b-1),psi(b)));
+                        spec = svd(phi1,U,S,V,args);
+                        psi.ref(b) = U;
+                        phi0 = S*V;
                         }
-                    PH.product(M,Aw);
-                    energy = real(eltC(dag(M)*Aw));
-                    }
-                else
-                    {
-                    psi.Aref(b) = phi;
+
+                    H.numCenter(numCenter-1);
+                    H.position(b1,psi);
+
+                    applyExp(H,phi0,-t/2,args);
+
+                    if(args.getBool("DoNormalize",true))
+                        phi0 /= norm(phi0);
+                    
+                    if(numCenter == 2)
+                        {
+                        psi.ref(b1) = phi0;
+                        }
+                    if(numCenter == 1)
+                        {
+                        if(ha == 1) psi.ref(b+1) *= phi0;
+                        else        psi.ref(b-1) *= phi0;
+                        }
+
+                    // Calculate energy
+                    ITensor H_phi0;
+                    H.product(phi0,H_phi0);
+                    energy = real(eltC(dag(phi0)*H_phi0));
                     }
 
-                if(!quiet)
-                    { 
-                    printfln("    Truncated to Cutoff=%.1E, Min_dim=%d, Max_dim=%d",
-                               sweeps.cutoff(sw),
-                               sweeps.mindim(sw), 
-                               sweeps.maxdim(sw) );
-                    printfln("    Trunc. err=%.1E, States kept: %s",
-                               spec.truncerr(),
-                               showDim(linkIndex(psi,b)) );
-                    }
-  
-                obs.lastSpectrum(spec);
-  
-                args.add("AtBond",b);
-                args.add("HalfSweep",ha);
-                args.add("Energy",energy); 
-                args.add("Truncerr",spec.truncerr()); 
-  
-                obs.measure(args);
-  
+            if(!quiet)
+                { 
+                printfln("    Truncated to Cutoff=%.1E, Min_dim=%d, Max_dim=%d",
+                         sweeps.cutoff(sw),
+                         sweeps.mindim(sw), 
+                         sweeps.maxdim(sw) );
+                printfln("    Trunc. err=%.1E, States kept: %s",
+                         spec.truncerr(),
+                         showDim(linkIndex(psi,b)) );
+                }
+
+            obs.lastSpectrum(spec);
+
+            args.add("AtBond",b);
+            args.add("HalfSweep",ha);
+            args.add("Energy",energy); 
+            args.add("Truncerr",spec.truncerr()); 
+
+            obs.measure(args);
+
             } //for loop over b
-        } // End NumCenter=1 case
-    else
-        {
-        Error("NumCenter must be 1 or 2");
-        }
+
+        if(!silent)
+            {
+            auto sm = sw_time.sincemark();
+            printfln("    Sweep %d/%d CPU time = %s (Wall time = %s)",
+                     sw,sweeps.nsweep(),showtime(sm.time),showtime(sm.wall));
+            }
+        
+        if(obs.checkDone(args)) break;
   
-    if(!silent)
-        {	
-         auto sm = sw_time.sincemark();
-         printfln("    Sweep %d/%d CPU time = %s (Wall time = %s)",
-                    sw,sweeps.nsweep(),showtime(sm.time),showtime(sm.wall));
-        }
-    
-    if(obs.checkDone(args)) break;
-  
-    } //for loop over sw
+        } //for loop over sw
   
     if(args.getBool("DoNormalize",true))
         {
