@@ -249,10 +249,11 @@ TDVPWorker(MPS & psi,
                         }
                     else if(numCenter == 1)
                         {
-                        ITensor U,S,V;
-                        if(ha == 1) V = ITensor(commonIndex(psi(b),psi(b+1)));
-                        else V = ITensor(commonIndex(psi(b-1),psi(b)));
-                        spec = svd(phi1,U,S,V,args);
+                        Index l;
+                        if(ha == 1) l = commonIndex(psi(b),psi(b+1));
+                        else        l = commonIndex(psi(b-1),psi(b));
+                        ITensor U,S,V(l);
+                        spec = svd(phi1,U,S,V);
                         psi.ref(b) = U;
                         phi0 = S*V;
                         }
