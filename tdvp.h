@@ -224,74 +224,74 @@ TDVPWorker(MPS & psi,
             else if(numCenter == 1)
                 phi1 = psi(b);
 
-                applyExp(H,phi1,t/2,args);
+            applyExp(H,phi1,t/2,args);
 
-                if(args.getBool("DoNormalize",true))
-                    phi1 /= norm(phi1);
+            if(args.getBool("DoNormalize",true))
+                phi1 /= norm(phi1);
    
             if(numCenter == 2)
                 spec = psi.svdBond(b,phi1,(ha==1 ? Fromleft : Fromright),H,args);
             else if(numCenter == 1)
                 psi.ref(b) = phi1;
 
-                // Calculate energy
-                ITensor H_phi1;
-                H.product(phi1,H_phi1);
-                energy = real(eltC(dag(phi1)*H_phi1));
-
-                if((ha == 1 && b+numCenter-1 != N) || (ha == 2 && b != 1))
+           // Calculate energy
+            ITensor H_phi1;
+            H.product(phi1,H_phi1);
+            energy = real(eltC(dag(phi1)*H_phi1));
+ 
+            if((ha == 1 && b+numCenter-1 != N) || (ha == 2 && b != 1))
+                {
+                auto b1 = (ha == 1 ? b+1 : b);
+ 
+                if(numCenter == 2)
                     {
-                    auto b1 = (ha == 1 ? b+1 : b);
-
-                    if(numCenter == 2)
-                        {
-                        phi0 = psi(b1);
-                        }
-                    else if(numCenter == 1)
-                        {
-                        Index l;
-                        if(ha == 1) l = commonIndex(psi(b),psi(b+1));
-                        else        l = commonIndex(psi(b-1),psi(b));
-                        ITensor U,S,V(l);
-                        spec = svd(phi1,U,S,V);
-                        psi.ref(b) = U;
-                        phi0 = S*V;
-                        }
-
-                    H.numCenter(numCenter-1);
-                    H.position(b1,psi);
-
-                    applyExp(H,phi0,-t/2,args);
-
-                    if(args.getBool("DoNormalize",true))
-                        phi0 /= norm(phi0);
-                    
-                    if(numCenter == 2)
-                        {
-                        psi.ref(b1) = phi0;
-                        }
-                    if(numCenter == 1)
-                        {
-                        if(ha == 1) psi.ref(b+1) *= phi0;
-                        else        psi.ref(b-1) *= phi0;
-                        }
-
-                    // Calculate energy
-                    ITensor H_phi0;
-                    H.product(phi0,H_phi0);
-                    energy = real(eltC(dag(phi0)*H_phi0));
+                    phi0 = psi(b1);
                     }
-
-            if(!quiet)
-                { 
-                printfln("    Truncated to Cutoff=%.1E, Min_dim=%d, Max_dim=%d",
-                         sweeps.cutoff(sw),
-                         sweeps.mindim(sw), 
-                         sweeps.maxdim(sw) );
-                printfln("    Trunc. err=%.1E, States kept: %s",
-                         spec.truncerr(),
-                         showDim(linkIndex(psi,b)) );
+                else if(numCenter == 1)
+                    {
+                    Index l;
+                    if(ha == 1) l = commonIndex(psi(b),psi(b+1));
+                    else        l = commonIndex(psi(b-1),psi(b));
+                    ITensor U,S,V(l);
+                    spec = svd(phi1,U,S,V);
+                    psi.ref(b) = U;
+                    phi0 = S*V;
+                    }
+ 
+                H.numCenter(numCenter-1);
+                H.position(b1,psi);
+ 
+                applyExp(H,phi0,-t/2,args);
+ 
+                if(args.getBool("DoNormalize",true))
+                    phi0 /= norm(phi0);
+                
+                if(numCenter == 2)
+                    {
+                    psi.ref(b1) = phi0;
+                    }
+                if(numCenter == 1)
+                    {
+                    if(ha == 1) psi.ref(b+1) *= phi0;
+                    else        psi.ref(b-1) *= phi0;
+                    }
+ 
+                // Calculate energy
+                ITensor H_phi0;
+                H.product(phi0,H_phi0);
+                energy = real(eltC(dag(phi0)*H_phi0));
                 }
+ 
+             if(!quiet)
+                 { 
+                 printfln("    Truncated to Cutoff=%.1E, Min_dim=%d, Max_dim=%d",
+                          sweeps.cutoff(sw),
+                          sweeps.mindim(sw), 
+                          sweeps.maxdim(sw) );
+                 printfln("    Trunc. err=%.1E, States kept: %s",
+                          spec.truncerr(),
+                          showDim(linkIndex(psi,b)) );
+                 }
 
             obs.lastSpectrum(spec);
 
