@@ -4,8 +4,8 @@
 # 2. Edit LIBRARY_DIR to point at the location of your ITensor Library
 #    source folder (this is the folder that has options.mk in it).
 #    Also, edit TDVP_DIR to point at the location of the TDVP source files.
-LIBRARY_DIR=$(HOME)/software/itensor
-TDVP_DIR=$(HOME)/software/tdvp
+LIBRARY_DIR=$(HOME)/itensor
+TDVP_DIR=$(HOME)/tdvp_basis
 
 # 3. If your 'main' function is in a file called 'myappname.cc', then
 #    set APP to 'myappname'. Running 'make' will compile the app.

@@ -163,7 +163,7 @@ TDVPWorker(MPS & psi,
     { 
     // Truncate blocks of degenerate singular values (or not)
     args.add("RespectDegenerate",args.getBool("RespectDegenerate",true));
-  
+
     const bool silent = args.getBool("Silent",false);
     if(silent)
         {
@@ -175,6 +175,10 @@ TDVPWorker(MPS & psi,
     const bool quiet = args.getBool("Quiet",false);
     const int debug_level = args.getInt("DebugLevel",(quiet ? -1 : 0));
     const int numCenter = args.getInt("NumCenter",2);
+    if(numCenter != 1)
+        args.add("Truncate",args.getBool("Truncate",true));
+    else
+        args.add("Truncate",args.getBool("Truncate",false));
 
     const int N = length(psi);
     Real energy = NAN;
@@ -253,7 +257,7 @@ TDVPWorker(MPS & psi,
                     if(ha == 1) l = commonIndex(psi(b),psi(b+1));
                     else        l = commonIndex(psi(b-1),psi(b));
                     ITensor U,S,V(l);
-                    spec = svd(phi1,U,S,V);
+                    spec = svd(phi1,U,S,V,args);
                     psi.ref(b) = U;
                     phi0 = S*V;
                     }
