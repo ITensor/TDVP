@@ -186,7 +186,6 @@ TDVPWorker(MPS & psi,
     psi.position(1);
 
     args.add("DebugLevel",debug_level);
-    args.add("DoNormalize",true);
 
     for(int sw = 1; sw <= sweeps.nsweep(); ++sw)
         {
