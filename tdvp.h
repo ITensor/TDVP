@@ -236,11 +236,6 @@ TDVPWorker(MPS & psi,
                 spec = psi.svdBond(b,phi1,(ha==1 ? Fromleft : Fromright),H,args);
             else if(numCenter == 1)
                 psi.ref(b) = phi1;
-
-           // Calculate energy
-            ITensor H_phi1;
-            H.product(phi1,H_phi1);
-            energy = real(eltC(dag(phi1)*H_phi1));
  
             if((ha == 1 && b+numCenter-1 != N) || (ha == 2 && b != 1))
                 {
@@ -283,6 +278,13 @@ TDVPWorker(MPS & psi,
                 ITensor H_phi0;
                 H.product(phi0,H_phi0);
                 energy = real(eltC(dag(phi0)*H_phi0));
+                }
+            else
+                {
+                // Calculate energy
+                ITensor H_phi1;
+                H.product(phi1,H_phi1);
+                energy = real(eltC(dag(phi1)*H_phi1));
                 }
  
              if(!quiet)
