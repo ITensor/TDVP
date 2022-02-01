@@ -76,7 +76,7 @@ denmatSumDecomp(std::vector<MPS> const& psis,
 		rho2.mapPrime(2,0);
 		rho2.swapPrime(0,1);
 		auto normPrho2P = norm(rho2);
-		if(normPrho2P/normrho2 < 1E-14)// TODO: changed to calculate the trace will have less complexity and have the same effect!
+		if(normPrho2P/normrho2 < 1E-12)// TODO: changed to calculate the trace will have less complexity and have the same effect!
 			{
 			res.ref(b) = cmb * U1;
 			if(!quiet)
@@ -194,6 +194,7 @@ void addBasis(MPS& phi,
 	for(int i = 0; i < dk-1; ++i)
 		{
 		auto args1 = Args("Method=",method,"Cutoff=",truncK.at(i),"Nsweep=",nsw);
+		if(args0.defined("WriteDim")) args1.add("WriteDim",args0.getInt("WriteDim"));
 		
 		if(i==0)
 			psis.at(i) = applyMPO(H,phi,args1);
@@ -242,6 +243,7 @@ void addBasis(MPS& phi,
 	for(int i = 0; i < dk-1; ++i)
 		{
 		auto args1 = Args("Method=",method,"MaxDim=",maxdimK.at(i),"Nsweep=",nsw);
+		if(args0.defined("WriteDim")) args1.add("WriteDim",args0.getInt("WriteDim"));
 		
 		if(i==0)
 			psis.at(i) = applyMPO(H,phi,args1);
