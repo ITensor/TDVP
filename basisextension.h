@@ -194,7 +194,11 @@ void addBasis(MPS& phi,
 	for(int i = 0; i < dk-1; ++i)
 		{
 		auto args1 = Args("Method=",method,"Cutoff=",truncK.at(i),"Nsweep=",nsw);
-		if(args0.defined("WriteDim")) args1.add("WriteDim",args0.getInt("WriteDim"));
+		if(args0.defined("WriteDim"))
+			{
+			args1.add("WriteDim",args0.getInt("WriteDim"));
+			if(args0.defined("WriteDir"))  args1.add("WriteDir",args.getString("WriteDir"));
+			}
 		
 		if(i==0)
 			psis.at(i) = applyMPO(H,phi,args1);
@@ -243,7 +247,11 @@ void addBasis(MPS& phi,
 	for(int i = 0; i < dk-1; ++i)
 		{
 		auto args1 = Args("Method=",method,"MaxDim=",maxdimK.at(i),"Nsweep=",nsw);
-		if(args0.defined("WriteDim")) args1.add("WriteDim",args0.getInt("WriteDim"));
+		if(args0.defined("WriteDim"))
+			{
+			args1.add("WriteDim",args0.getInt("WriteDim"));
+			if(args0.defined("WriteDir"))  args1.add("WriteDir",args.getString("WriteDir"));
+			}
 		
 		if(i==0)
 			psis.at(i) = applyMPO(H,phi,args1);
