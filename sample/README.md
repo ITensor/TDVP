@@ -19,7 +19,7 @@ Note there are other interfaces available for TDVP, which are similar to their [
 
 `t`: the time step of TDVP. It can be real, imaginary, or complex. The corresponding time evolution operator of a single time step will be <img src="https://render.githubusercontent.com/render/math?math=e^{tH}">. Therefore, to do real time evolution, `t` need to be purely imaginary; to do imaginary time evolution, `t` need to be purely real.
 
-`sweeps`: Specify the sweep parameters of TDVP (similar to DMRG). `nsweeps` is the number of TDVP sweeps. A TDVP sweep = a sweep from left to right with half time step + a sweep from right to left with half time step. The total evolution time = `t*nsweep`. `maxdim` is the maximum bond dimension of the sweep. `cutoff` is the truncation error of the sweep. `niter` is the maximum number of lanczos iterations used when solving each local effective TDVP equations.
+`sweeps`: Specify the sweep parameters of TDVP (similar to DMRG). `nsweeps` is the number of TDVP sweeps. A TDVP sweep = a sweep from left to right with half time step + a sweep from right to left with half time step. The total evolution time = `t*nsweep`. `maxdim` is the maximum bond dimension of the sweep. `cutoff` is the truncation error of the sweep (to allow truncation for the one-site TDVP, one needs to set the `Truncate` `args` to `true` (see below)). `niter` is the maximum number of lanczos iterations used when solving each local effective TDVP equations.
 
 `obs`: is the observer one can customize to do measurement after each sweep without recalling the `tdvp` function. Similar to its use in DMRG.
 
