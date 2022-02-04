@@ -197,7 +197,7 @@ void addBasis(MPS& phi,
 		if(args0.defined("WriteDim"))
 			{
 			args1.add("WriteDim",args0.getInt("WriteDim"));
-			if(args0.defined("WriteDir"))  args1.add("WriteDir",args.getString("WriteDir"));
+			if(args0.defined("WriteDir"))  args1.add("WriteDir",args0.getString("WriteDir"));
 			}
 		
 		if(i==0)
@@ -250,7 +250,7 @@ void addBasis(MPS& phi,
 		if(args0.defined("WriteDim"))
 			{
 			args1.add("WriteDim",args0.getInt("WriteDim"));
-			if(args0.defined("WriteDir"))  args1.add("WriteDir",args.getString("WriteDir"));
+			if(args0.defined("WriteDir"))  args1.add("WriteDir",args0.getString("WriteDir"));
 			}
 		
 		if(i==0)
