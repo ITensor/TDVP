@@ -58,7 +58,7 @@ int main()
 
     auto sweeps = Sweeps(1);
     sweeps.maxdim() = 2000;
-    //sweeps.cutoff() = 1E-12;
+    sweeps.cutoff() = 1E-12;
     sweeps.niter() = 10;
 
     for(int n = 1; n <= nsw; ++n)
@@ -75,7 +75,8 @@ int main()
             }
         
         // TDVP sweep
-        energy = tdvp(psi1,H,-t,sweeps,{"DoNormalize",true,
+        energy = tdvp(psi1,H,-t,sweeps,{"Truncate",true,
+                                        "DoNormalize",true,
                                         "Quiet",true,
                                         "NumCenter",1});
         }
