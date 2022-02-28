@@ -1,6 +1,6 @@
 # TDVP
 ITensor implementation of the time dependent variational principle (TDVP) algorithm for finite MPS.
-It also includes a global subspace expansion algorithm to enlarge the bond dimension of the MPS for TDVP according to the paper [arXiv:2005.06104](https://arxiv.org/abs/2005.06104) or [Phys. Rev. B 102, 094315 (2020)](https://journals.aps.org/prb/abstract/10.1103/PhysRevB.102.094315).
+It also includes a global subspace expansion algorithm to enlarge the bond dimension of the MPS for TDVP according to the paper [arXiv:2005.06104](https://arxiv.org/abs/2005.06104) or [Phys. Rev. B 102, 094315 (2020)](https://journals.aps.org/prb/abstract/10.1103/PhysRevB.102.094315), which would be useful for reliable time evolution of two-dimensional systems and one-dimensional systems with long-range interactions.
 
 Requires a working version of the ITensor library on your system.
 
