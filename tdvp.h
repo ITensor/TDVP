@@ -183,7 +183,8 @@ TDVPWorker(MPS & psi,
     const int N = length(psi);
     Real energy = NAN;
 
-    psi.position(1);
+    if((!isOrtho(psi)) || (psi.leftLim() != 0))
+        psi.position(1);
 
     args.add("DebugLevel",debug_level);
 
@@ -320,11 +321,9 @@ TDVPWorker(MPS & psi,
   
         } //for loop over sw
   
+    psi.rightLim(psi.leftLim()+2);
     if(args.getBool("DoNormalize",true))
-        {
-        if(numCenter==1) psi.position(1);
         psi.normalize();
-        }
 
     return energy;
     }
