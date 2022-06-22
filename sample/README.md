@@ -2,6 +2,8 @@ To run this sample TDVP code, you first need to have ITensor V3
 installed. Then, edit the Makefile to point towards your installation
 of ITensor as well as the location of the TDVP source code (the tdvp.h header file).
 
+If you have any questions about this repository, please contact <mingruy@uci.edu>.
+
 ### TDVP
 
 #### Function
@@ -15,7 +17,7 @@ Note there are other interfaces available for TDVP, which are similar to their [
 
 `psi`: the MPS to be time evolved.
 
-`H`: the MPO of the Hamiltonian. Currently only Hermitian Hamiltonians can be treated; for non-Hermitian Hamiltonians, please contact <mingruy@uci.edu> for help.
+`H`: the MPO of the Hamiltonian. Currently only Hermitian Hamiltonians can be treated; for non-Hermitian Hamiltonians, please merge this [pull request](https://github.com/ITensor/ITensor/pull/410) to your ITensor and set the argument `IsHermitian` to be `false` in the `tdvp` function.
 
 `t`: the time step of TDVP. It can be real, imaginary, or complex. The corresponding time evolution operator of a single time step will be <img src="https://render.githubusercontent.com/render/math?math=e^{tH}">. Therefore, to do real time evolution, `t` need to be purely imaginary; to do imaginary time evolution, `t` need to be purely real.
 
