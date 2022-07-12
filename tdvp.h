@@ -200,7 +200,7 @@ TDVPWorker(MPS & psi,
  
         if(!H.doWrite()
            && args.defined("WriteDim")
-           && sweeps.maxdim(sw) >= args.getInt("WriteDim"))
+           && maxLinkDim(psi) >= args.getInt("WriteDim"))
             {
             if(!quiet)
                 {
