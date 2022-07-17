@@ -78,7 +78,8 @@ int main()
         energy = tdvp(psi1,H,-t,sweeps,{"Truncate",true,
                                         "DoNormalize",true,
                                         "Quiet",true,
-                                        "NumCenter",1});
+                                        "NumCenter",1,
+                                        "ErrGoal",1E-7});
         }
 
     printfln("\nEnergy after imaginary time evolution = %.10f",energy);
